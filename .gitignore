@@ -13,4 +13,4 @@ __pycache__/
 # Project
 /maps_list.txt
 /maps_files*
-/output
+/output*
