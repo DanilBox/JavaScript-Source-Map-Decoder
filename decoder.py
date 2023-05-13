@@ -48,6 +48,13 @@ def save_statistic_file(output_file_folder: Path, statistic: Any) -> None:
     output_file_folder.write_text(json.dumps(statistic, indent=2))
 
 
+def remove_first_slash(file_path: str) -> str:
+    while file_path.startswith("/"):
+        file_path = file_path.removeprefix("/")
+
+    return file_path
+
+
 def save_decode_result(output_folder: Path, bundle_name: str, decode_result: source_maps.DecodeResult) -> None:
     folder_path = output_folder / bundle_name
     if not folder_path.exists():
@@ -75,7 +82,7 @@ def save_decode_result(output_folder: Path, bundle_name: str, decode_result: sou
             file_path = new_value
 
         # Убираем первый '/', что-бы не попасть в корень диска
-        file_path = file_path.removeprefix("/")
+        file_path = remove_first_slash(file_path)
 
         # Путь восстанавливаемого файла в Sources Map
         file_path_in_sm = relative_folder_in_sm / file_path
