@@ -15,12 +15,40 @@ class FileType(StrEnum):
     AUTO = "auto"
 
 
+def parse_array_urls_line(urls_line: str) -> list[str]:
+    urls: list[str] = []
+
+    urls_line = urls_line.removeprefix("[").removesuffix("]")
+    for raw_url in urls_line.split(","):
+        url = raw_url.strip().strip("'").strip('"')
+        if url == "":
+            continue
+
+        urls.append(url)
+
+    return urls
+
+
 def get_urls_from_file(input_file: str) -> list[str]:
     file_path = Path(input_file)
     if not file_path.exists():
         exit(f"Файл '{file_path.name}' не существует")
 
-    return file_path.read_text(encoding="utf-8").splitlines()
+    urls: list[str] = []
+
+    raw_urls_list = file_path.read_text(encoding="utf-8").splitlines()
+    for raw_url in raw_urls_list:
+        url = raw_url.strip()
+        if url == "":
+            continue
+
+        if url.startswith("[") and url.endswith("]"):
+            urls.extend(parse_array_urls_line(url))
+            continue
+
+        urls.append(url)
+
+    return urls
 
 
 def regexp_compile(regexp: str) -> Pattern[str] | None:
@@ -37,10 +65,6 @@ def urls_filter(urls: list[str], filter_regexp: str) -> list[str]:
 
     filtered_urls: list[str] = []
     for url in urls:
-        url = url.strip()
-        if url == "":
-            continue
-
         if _re.search(url) is None:
             continue
 
